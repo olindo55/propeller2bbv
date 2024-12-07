@@ -36,21 +36,23 @@ class Propeller
         $allSurveys = [];
         
         $sitesData = $this->getSites($organization);
-        foreach ($sitesData['results'] as $site){
-            $surveys = $this->getSurveys($organization, $site['id'], $dateFormatted);
-            
-            foreach($surveys['results'] as $survey){
-                $data['organization_id'] = $organization;
-                $data['survey_id'] = $survey['id'];
-                $data['site'] = $site['name'];
-                $data['name'] = $survey['name'];
-                $data['date_captured'] = date('d/m/Y', strtotime($survey['date_captured']));
-                $data['site_id'] = $site['id'];
+        if (isset($sitesData['results'])) {
+            foreach ($sitesData['results'] as $site){
+                $surveys = $this->getSurveys($organization, $site['id'], $dateFormatted);
+                
+                foreach($surveys['results'] as $survey){
+                    $data['organization_id'] = $organization;
+                    $data['survey_id'] = $survey['id'];
+                    $data['site'] = $site['name'];
+                    $data['name'] = $survey['name'];
+                    $data['date_captured'] = date('d/m/Y', strtotime($survey['date_captured']));
+                    $data['site_id'] = $site['id'];
 
-                $allSurveys[] = $data;
+                    $allSurveys[] = $data;
+                }
             }
+            return $allSurveys;
         }
-        return $allSurveys;
     }
 
     public function checkToken($token){
@@ -61,7 +63,6 @@ class Propeller
                     'accept' => 'application/json',
                 ],
             ]);
-            
             return [
                 'success' => true,
                 'message' => 'Token valid'
