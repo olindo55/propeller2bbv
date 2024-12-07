@@ -11,5 +11,7 @@
             "email": "julien.martinati@vinci-construction.com"
         }
     ],
-    "require": {}
+    "require": {
+        "guzzlehttp/guzzle": "^7.9"
+    }
 }
