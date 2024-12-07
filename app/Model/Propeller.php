@@ -2,11 +2,7 @@
 namespace App\Model;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
-// use Dotenv\Dotenv;
 use DateTime;
-
-// $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
-// $dotenv->load();
 
 class Propeller
 {
