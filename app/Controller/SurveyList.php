@@ -6,8 +6,26 @@ use App\Model\FileDownloader;
 use App\Model\LargeFileDownloader;
 
 
-class SurveysList
+class SurveyList
 {
+    public function view()
+    {
+        if(isset($_SESSION['propellerToken'])){
+    
+            return [
+                'template' => 'surveyList',
+                // 'data'=> $_SESSION['surveyData'],
+            ];
+        }
+        else{
+            $_SESSION['flash_message'] = 'Accès non autorisé';
+            $_SESSION['flash_alert'] = 'danger';
+            return [
+                'template' => 'homepage',
+            ];
+        }
+    }
+    
     public function download()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

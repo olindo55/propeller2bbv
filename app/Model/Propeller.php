@@ -27,18 +27,23 @@ class Propeller
         return json_encode($compare);
     }
 
-    public function allSurveys($organization, $date)
-    {
+    public function formattedDate($date){
         $datetime = new DateTime($date);
         $iso = $datetime->format('Y-m-d\TH:i:s\Z');
-        $dateFormatted = str_replace(":", "%3A", $iso);
+        return str_replace(":", "%3A", $iso);
+    }
+
+    public function surveyList($organization, $from, $to)
+    {
+        $from = $this->formattedDate($from);
+        $to = $this->formattedDate($to);
 
         $allSurveys = [];
         
         $sitesData = $this->getSites($organization);
         if (isset($sitesData['results'])) {
             foreach ($sitesData['results'] as $site){
-                $surveys = $this->getSurveys($organization, $site['id'], $dateFormatted);
+                $surveys = $this->getSurveys($organization, $site['id'], $from, $to);
                 
                 foreach($surveys['results'] as $survey){
                     $data['organization_id'] = $organization;
@@ -141,12 +146,12 @@ class Propeller
      *      "name": 241129 A46 Compound (West),
      *    }
      */
-    public function getSurveys($organization, $site, $date)
+    public function getSurveys($organization, $site, $from, $to)
     {
-        $now = new DateTime();
-        $nowFormatted = str_replace(":", "%3A", $now->format('Y-m-d\TH:i:s\Z'));
+        // $now = new DateTime();
+        // $nowFormatted = str_replace(":", "%3A", $now->format('Y-m-d\TH:i:s\Z'));
 
-        $uri = $this->uriBase.$organization.'/sites/'.$site.'/surveys?date_captured_lt='.$nowFormatted.'&date_captured_gt='.$date;
+        $uri = $this->uriBase.$organization.'/sites/'.$site.'/surveys?date_captured_lt='.$to.'&date_captured_gt='.$from;
         $response = $this->api($uri);
         return $response;
 

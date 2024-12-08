@@ -30,31 +30,39 @@ class SurveySearch
     public function find()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Récupérer et valider les données
             $sublotId = $_POST['sublot_id'] ?? null;
             $fromDate = $_POST['from_date'] ?? null;
+            $toDate = $_POST['to_date'] ?? null;
             
+            // header('Content-Type: application/json');
+
             // Validation
-            if (!$sublotId || !$fromDate) {
-                return [
-                    'template' => 'error',
-                    'error' => 'Missing required fields'
-                ];
+            if (!$sublotId || !$fromDate || !$toDate) {
+                echo json_encode([
+                    'template' => 'surveySearch',
+                    'success' => false,
+                    'message' => 'Missing required fields'
+                ]);
+            }
+            if ($fromDate > $toDate){
+                echo json_encode([
+                    'template' => 'surveySearch',
+                    'success' => false,
+                    'message' => 'Date error'
+                ]);
             }
             
-            // Appeler votre modèle pour traiter les données
+            // Call model to get the list of surveys
             $propeller = new Propeller;
-            $result = $propeller->allSurveys($sublotId, $fromDate);
-            // var_dump($result);
-            return [
-                'template' => 'surveysList',
+            $result = $propeller->surveyList($sublotId, $fromDate, $toDate);
+
+            $_SESSION['surveyData'] = [
                 'surveys' => $result
             ];
+            echo json_encode([
+                'success' => true,
+            ]);
         }
-        
-        // Si ce n'est pas un POST, rediriger vers la page d'accueil
-        header('Location: /');
-        exit;
+        exit();
     }
-
 }

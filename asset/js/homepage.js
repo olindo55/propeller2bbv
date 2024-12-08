@@ -2,11 +2,11 @@ import MyToast from './class/MyToast.js';
 
 const spinnerContainer = document.getElementById('spinner-container');
 const form = document.querySelector('form');
-const compareBtn = document.getElementById('tokenBtn');
+const enterBtn = document.getElementById('tokenBtn');
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault()
-    compareBtn.disabled = true;
+    enterBtn.disabled = true;
     spinnerContainer.classList.remove('d-none');
     
     const token = document.getElementById('tokenInput').value.trim();
@@ -36,10 +36,11 @@ form.addEventListener('submit', async (e) => {
 
     } catch (error) {
         console.error('Error:', error);
-        alert(error.message);
+        const toast = new MyToast(error.message, 'danger');
+        toast.show();
     } finally {
         spinnerContainer.classList.add('d-none');
-        compareBtn.disabled = false;
+        enterBtn.disabled = false;
     }
 });
 
