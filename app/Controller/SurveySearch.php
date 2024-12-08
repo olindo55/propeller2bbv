@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Model\Propeller;
 
-class Surveys
+class SurveySearch
 {
     public function view()
     {
@@ -14,7 +14,7 @@ class Surveys
             $listSubLot = $propeller->getOrganizations();
     
             return [
-                'template' => 'surveys',
+                'template' => 'surveySearch',
                 'sublot'=> $listSubLot,
             ];
         }
@@ -27,7 +27,7 @@ class Surveys
         }
     }
 
-    public function compare()
+    public function find()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Récupérer et valider les données
