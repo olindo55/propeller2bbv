@@ -27,9 +27,8 @@ form.addEventListener('submit', async function(e) {
         }
 
         const data = await response.json();
-        console.log(data)
         if (data.success){
-            window.location.href = 'surveyList/view';
+            window.location.href = '/surveyList/view';
             return;
         } else {
             const toast = new MyToast(data.message, 'danger');

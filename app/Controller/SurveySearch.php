@@ -34,7 +34,7 @@ class SurveySearch
             $fromDate = $_POST['from_date'] ?? null;
             $toDate = $_POST['to_date'] ?? null;
             
-            // header('Content-Type: application/json');
+            header('Content-Type: application/json');
 
             // Validation
             if (!$sublotId || !$fromDate || !$toDate) {
@@ -56,9 +56,7 @@ class SurveySearch
             $propeller = new Propeller;
             $result = $propeller->surveyList($sublotId, $fromDate, $toDate);
 
-            $_SESSION['surveyData'] = [
-                'surveys' => $result
-            ];
+            $_SESSION['surveyData'] = ['surveys' => $result];
             echo json_encode([
                 'success' => true,
             ]);
