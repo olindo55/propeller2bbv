@@ -1,7 +1,11 @@
-        
+import MyToast from './class/MyToast.js';
+
+
 // selectAll
 const selectAllCheckbox = document.getElementById('selectAll');
 const tdCheckboxes = document.querySelectorAll('td input[type="checkbox"]');
+const spinnerContainer = document.getElementById('spinner-container');
+const downloadBtn = document.getElementById('downloadBtn');
 
 selectAllCheckbox.addEventListener('change', function() {
     tdCheckboxes.forEach(checkbox => {
@@ -12,6 +16,10 @@ selectAllCheckbox.addEventListener('change', function() {
 
 document.getElementById('surveyForm').addEventListener('submit', async (event) => {
     event.preventDefault()
+
+    downloadBtn.disabled = true;
+    spinnerContainer.classList.remove('d-none');
+
     // const urls = [
     //     'https://srv-01-eu-west-1.data.propelleraero.com/ob1a160b21/pqb8fa95b4_site_dsm.tiff?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly8qL29iMWExNjBiMjEvKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTczMzgzODk5Mn19fV19&Signature=xa8aWlOpfsbe3c4zqFz9L4Y35jcSmXXKxW2VIb-E0-U286BtQ2ROcNyD1ghku~Ga~TN06nxNj~ZpyegQotLevHgSyg8t1MzW5VRl8xS-WT8xQ6Mpum9D2FA6PwQbqAXr1kFxVbNkWE3oAUgzehFhIR6OiiLnImabye~RqJ5btmS6Hhrcwpm4TiJVm1YUxzNVGhX4WPncwTrsDZl3UUU-olHAVR8PxqKBxb3WX5NWDqccviwyH1ZIQwQdpqNSWJlvJPL9NHRFxv-GRS14t6JmBqAl38Hxq9e5ZwuRluqz0ViiYCSScmCmBR7wU9qFZFkmPFUzT4tdFeMMwH1OAtjzDg__&Key-Pair-Id=APKAI6AKZOWIA7VNVEUQ&response-content-disposition=attachment&response-cache-control=max-age%3D31536000',
     //     'https://srv-01-eu-west-1.data.propelleraero.com/obde1febc2/002_pqb8fa95b4-DSM.tiff?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly8qL29iZGUxZmViYzIvKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTczMzgzODk5Mn19fV19&Signature=TFoQn7XclhntNC1TD6ALj6KaywkjIafYQPje44-z2RD1U2gnUJJcZMstBPDiihmVh7ha7sJTyVj3Xukf3JQwjWYclB3HE6LMCbfP4MLRgc6XPq3xWtDF-YWJew6hRxK-qAmCheUOG~5BNXFzS2g3akW3OPbGMGRLJTYJNRNRwpOrswRCMnQBEHcry5VMa9pIX3ViIIuuIFFUAAuOIYipsqr4wDd42oIpk3R0lmLhcDEAhCy5MbxLD1QF5r1syjpxMZFi05VpKQA-RE59lineU5O27e~gdXHy53PtvLGIgpqm-W4ewd8trjNs6QAMESRe1JWerLUSb0ulOFwSy1GNug__&Key-Pair-Id=APKAI6AKZOWIA7VNVEUQ&response-content-disposition=attachment&response-cache-control=max-age%3D31536000',
@@ -31,19 +39,29 @@ document.getElementById('surveyForm').addEventListener('submit', async (event) =
             survey_id: checkbox.value,
             site: row.cells[1].textContent.trim(),
             name: row.cells[2].textContent.trim(),
+            date_captured: row.cells[2].textContent.trim(),
             organization_id: row.cells[4].textContent.trim(),
             site_id: row.cells[5].textContent.trim()
         };
     });
+    
+    try {
+        const response = await fetch('/surveyList/downloadSurveys', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                data: data
+            })
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        const toast = new MyToast(error.message, 'danger');
+        toast.show();
+    } finally {
+        spinnerContainer.classList.add('d-none');
+        downloadBtn.disabled = false;
+    }
 
-    const response = await fetch('/surveyList/downloadSurveys', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            action: 'createZip',
-            data: data
-        })
-    });
 });
