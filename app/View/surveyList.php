@@ -13,7 +13,7 @@
             </thead>
             <tbody>
                 <?php
-                $result = $data['surveys'];
+                $result = $_SESSION['surveyData']['surveys'];
                 if (isset($result) && !empty($result)) {
                     foreach ($result as $item): ?>
                         <tr>

@@ -1,9 +1,11 @@
 
 <?php
     $flashMessage = '';
+    $flashAlert = null;
+    
     if (isset($_SESSION['flash_message'])) {
         $flashMessage = $_SESSION['flash_message'];
-        $flashAlert =$_SESSION['flash_alert'];
+        $flashAlert = $_SESSION['flash_alert'];
         unset($_SESSION['flash_message']);
         unset($_SESSION['flash_alert']);
     }

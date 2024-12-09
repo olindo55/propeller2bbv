@@ -12,7 +12,7 @@ document.getElementById('surveyForm').addEventListener('submit', async (event) =
 
     ];
 
-    const response = await fetch('/surveysList/download', {
+    const response = await fetch('/surveyList/download', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
