@@ -3,7 +3,7 @@ namespace App\Model;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 use DateTime;
-
+use GuzzleHttp\Client;
 class Propeller
 {
     private $client;
@@ -16,16 +16,16 @@ class Propeller
         }
     }
 
-    public function compare()
-    {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $organization = $data['subLot'];
-        $date = $data['date'];
+    // public function compare()
+    // {
+    //     $data = json_decode(file_get_contents('php://input'), true);
+    //     $organization = $data['subLot'];
+    //     $date = $data['date'];
 
-        $compare=$this->allSurveys($organization, $date);
+    //     $compare=$this->allSurveys($organization, $date);
 
-        return json_encode($compare);
-    }
+    //     return json_encode($compare);
+    // }
 
     public function formattedDate($date){
         $datetime = new DateTime($date);
