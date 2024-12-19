@@ -2,7 +2,28 @@
 namespace App\Model;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
+
 use DateTime;
+use GuzzleHttp\Client;
+use ZipArchive;
+
+// Configuration
+ini_set('max_execution_time', 300);
+ini_set('memory_limit', '16G');
+ini_set('post_max_size', '16G');
+ini_set('upload_max_filesize', '16G');
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+ini_set('log_errors', 1);
+ini_set('error_log', 'php_errors.log');
+
+function logMessage($message) {
+    date_default_timezone_set('UTC');
+    $timestamp = date('Y-m-d H:i:s');
+    error_log("[$timestamp] $message");
+}
 
 class Propeller
 {
@@ -16,15 +37,64 @@ class Propeller
         }
     }
 
-    public function compare()
-    {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $organization = $data['subLot'];
-        $date = $data['date'];
+    function downloadFiles($surveyName, $filesData) {
+        $temp_dir = 'temp_downloads/';
+        if (!file_exists($temp_dir)) {
+            mkdir($temp_dir, 0777, true);
+            logMessage("Dossier temporaire créé: " . realpath($temp_dir));
+        }
+        logMessage($surveyName . " : Début du téléchargement...");
+        $files = [];
+        $index = -1;
 
-        $compare=$this->allSurveys($organization, $date);
+        foreach ($filesData['results'] as $file){
+            $index += 1;
 
-        return json_encode($compare);
+            if ($index >= 2) {
+                break;
+            }
+            
+            $cleanName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $file['name']); // Remplace les caractères spéciaux par _
+            $cleanName = preg_replace('/_+/', '_', $cleanName);                 // Évite les __ multiples
+            $cleanName = trim($cleanName, '_');                                 // Enlève les _ au début et à la fin
+            
+            $filename = sprintf("%02d", $index + 1) . '_'. $cleanName . '.' . $file['format'];
+            $url = $file['url'];
+            $size = $file['size_bytes'];
+
+            $filepath = $temp_dir . $filename;
+
+            logMessage("File " . ($index + 1) . "/" . count($filesData['results']) . " : " . $filename . "(Taille: " . floor($size/1000) . " KB)");
+
+            try {
+                $ch = curl_init($url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $content = curl_exec($ch);
+                
+                if ($content === false) {
+                    logMessage("ERREUR CURL: " . curl_error($ch));
+                    continue;
+                }
+                
+                $filesize = file_put_contents($filepath, $content);
+                if ($filesize === false) {
+                    logMessage("ERREUR: Impossible de sauvegarder $filename");
+                    continue;
+                }
+                
+                logMessage("Fichier sauvegardé: $filename (Taille: " . floor($filesize/1000) . " KB)");
+                $files[] = $filepath;
+                
+                curl_close($ch);
+                
+            } catch (Exception $e) {
+                logMessage("ERREUR: " . $e->getMessage());
+            }
+        }
+        
+        return $files;
     }
 
     public function formattedDate($date){
@@ -181,21 +251,6 @@ class Propeller
         return $response;
     }
 
-
-    // get the environment variable
-    private static function getEnv($key, $default = null)
-    {
-        if (isset($_ENV[$key])) {
-            return $_ENV[$key];
-        }
-        
-        $value = getenv($key);
-        if ($value !== false) {
-            return $value;
-        }
-        
-        return $default;
-    }
 
 
 }
