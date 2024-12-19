@@ -50,9 +50,9 @@ class Propeller
         foreach ($filesData['results'] as $file){
             $index += 1;
 
-            // if ($index >= 2) {
-            //     break;
-            // }
+            if ($index >= 2) {
+                break;
+            }
             
             $cleanName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $file['name']); // Remplace les caractères spéciaux par _
             $cleanName = preg_replace('/_+/', '_', $cleanName);                 // Évite les __ multiples
@@ -96,33 +96,6 @@ class Propeller
         
         return $files;
     }
-
-    // function createZip($files, $zipname) {
-    //     logMessage("Création du ZIP: " . $zipname);
-        
-    //     $zip = new ZipArchive();
-    //     if ($zip->open($zipname, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-    //         foreach ($files as $file) {
-    //             if (file_exists($file)) {
-    //                 $zip->addFile($file, basename($file));
-    //                 logMessage("Fichier ajouté au ZIP: " . basename($file));
-    //             }
-    //         }
-    //         $zip->close();
-    //         logMessage("Zip closed");
-            
-    //         // Nettoyage
-    //         foreach ($files as $file) {
-    //             if (file_exists($file)) {
-    //                 unlink($file);
-    //             }
-    //         }
-    //         rmdir('temp_downloads');
-            
-    //         return true;
-    //     }
-    //     return false;
-    // }
 
     public function formattedDate($date){
         $datetime = new DateTime($date);
